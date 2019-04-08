@@ -1,0 +1,32 @@
+fmod NAT-UTIL is
+    protecting NAT .
+
+    *** nonetype declaration
+    op noneNat : -> Nat .
+
+    *** Variables to use
+    var N M : Nat .
+
+    *** Boolean operators
+    op _!=_ : Nat Nat -> Bool .
+    eq N != M =
+        if N == M then
+            false
+        else
+            true
+        fi .
+
+    *** Natural List
+    sort NatList .
+    subsort Nat < NatList .
+
+    op mtList : -> NatList [ctor] .
+    op _::_ : Nat NatList -> NatList [ctor] .
+    op length : NatList -> Nat .
+    var L : NatList .
+    eq N :: noneNat = N .
+    eq noneNat :: N = N .
+    eq length(mtList) = 0 .
+    eq length(N) = 1 .
+    eq length(N :: L) = length(L) + 1 .
+endfm

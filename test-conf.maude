@@ -1,0 +1,102 @@
+***(
+    int main(){
+        int i = 0;
+        int res = 0 ;
+        for(i = 0 ; i < 5 ; i ++){
+            res = res + 1;
+        }
+    }
+)
+load nat-util.maude .
+
+mod TEST-CONF is
+    --- imports
+    protecting INT .
+    protecting NAT-UTIL .
+
+    sorts Oid Cid Configuration Object Attribute AttributeSet Msg .
+    sorts Memory For Counter Stack Value .
+
+    subsort Object < Configuration .
+    subsort Attribute < AttributeSet .
+    subsort Msg < Configuration .
+
+    --- Numbering object ids
+    subsort Nat < Oid .
+    --- Allow multiple configurations
+    subsort For < Cid .
+    subsort Memory < Cid .
+
+    --- things we can use for attributes
+    subsort Nat < Counter .
+    subsort Nat < Value .
+    subsort NatList < Stack .
+
+    --- empty/static things
+    op none : -> Configuration .
+    op null : -> AttributeSet .
+
+    op for : -> For .
+    op mem : -> Memory .
+
+    --- concat multiple configurations
+    op __ : Configuration Configuration -> Configuration 
+                                                  [ assoc comm id: none ] . 
+	--- concat list of attributes
+    op _`,_ : AttributeSet AttributeSet -> AttributeSet 
+                                                  [ assoc comm id: null ] . 
+    --- create object
+    op <_:_|_> : Oid Cid AttributeSet -> Object .
+    
+    --- attributes
+    op cnt`:_ : Counter -> Attribute [ gather ( & ) ] .
+    op cntMax`:_ : Counter -> Attribute [ gather ( & ) ] .
+    op stack`:_ : Stack -> Attribute [ gather ( & ) ] .
+    op topush`:_ : Value -> Attribute [ gather ( & ) ] .
+
+
+    --- initialize configurations .
+    op initmem : -> Configuration .
+    op initfor : -> Configuration .
+
+    --- VARIABLES
+    vars N M O : Nat .
+    vars L : NatList .
+    
+    --- initialization equations for configuration
+    eq initmem = < 0 : mem | stack : mtList, topush : noneNat > .
+    eq initfor = < 0 : for | cnt : 0 > .
+
+    --- delete configuration?
+
+    --- for loop counter
+    crl [increment] : < N : for | cnt : M, cntMax : O > =>
+        < N : for | cnt : M + 1, cntMax : O > 
+            if M < O .
+    
+    --- memory stack push pop operations
+    crl [pushToEmpty] : < N : mem | stack : L, topush : M > =>
+        < N : mem | stack : M, topush : noneNat >
+            if M != noneNat and L == mtList .
+    crl [pushToNonEmpty] : < N : mem | stack : L, topush : M > =>
+        < N : mem | stack : M :: L, topush : noneNat >
+            if M != noneNat and length(L) > 0 .
+    
+    crl [popSingleElementList] : < N : mem | stack : L, topush : noneNat > =>
+        < N : mem | stack : mtList, topush : noneNat > 
+            if length(L) == 1 .
+    crl [popNonEmpty] : < N : mem | stack : M :: L, topush : noneNat > =>
+        < N : mem | stack : L, topush : noneNat >
+            if M != noneNat and length(M :: L) >= 1 .
+    
+    
+endm
+--- set trace on .
+
+--- rew [1] < 0 : mem | stack : 6, topush : 5 > .
+--- rew [1] < 0 : mem | stack : mtList, topush : noneNat > .
+--- rew [2] < 0 : mem | stack : 5 , topush : noneNat > .
+rew [3] < 0 : mem | stack : 15 :: 5 , topush : noneNat > < 0 : for | cnt : 0, cntMax : 2 > .
+
+--- red initfor .
+--- search initfor =>! X:Configuration .

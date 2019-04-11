@@ -13,9 +13,10 @@ Stack push pop has been implemented with a NatList.  Also for loop emulation has
 * Need to integrate the for loop into the full configuration and rename it
 * while loops
 * Verify small C program first by hand before going into automation
-* Add a way to limit values to only bytes in Nat-util
 * Abstract interpretation for numbers
 * Track variable names in the stack
+* Build MACHINEINT-BYTE values into the stack
+* Redo NAT-UTIL (rename also) so that they put MachineIntList together
 
 # Long term TODOs
 * Figure out function calls

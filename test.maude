@@ -1,9 +1,4 @@
-fmod NAT-CUSTOM is
-    protecting NAT .
-    op _-_ : Nat Nat -> Nat .
-
-    vars N M : Nat .
-    eq N - 0 = N .
-    eq 0  - (N + 1) = 0 .
-    eq (N + 1) - (M + 1) = N - M .
+load /home/pk/maude/machine-int.maude 
+fmod TEST is
+    protecting MACHINE-INT{32-BIT} .
 endfm

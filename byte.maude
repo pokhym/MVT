@@ -1,0 +1,35 @@
+***(
+    This fmod defines a way to turn any natural number
+    into a byte
+
+    http://maude.cs.illinois.edu/w/images/c/cc/Talk%24Riocuarto-maude.pdf
+)
+load /home/pk/maude/machine-int.maude 
+
+fmod MACHINEINT-BYTE is 
+    protecting MACHINE-INT{32-BIT} .
+    sort MachineIntList .
+    subsort MachineInt < MachineIntList .
+
+    --- This operator converts an integer into a sequence of bytes
+    --- the address increases from right to left (therefore little endian)
+    op [_] : MachineInt -> MachineIntList .
+    op _._ : MachineInt MachineInt -> MachineIntList [ctor assoc] .
+
+    var L : MachineIntList .
+    vars A B : MachineInt .
+
+    eq [A] = 
+        if (A >> 8) == 0 then
+            A
+        else
+            [A >> 8] . (A & ((1).MachineInt << 7)) + (A & ((1).MachineInt << 6)) + 
+                (A & ((1).MachineInt << 5)) + (A & ((1).MachineInt << 4)) + 
+                (A & ((1).MachineInt << 3)) + (A & ((1).MachineInt << 2)) + 
+                (A & ((1).MachineInt << 1)) + (A & ((1).MachineInt << 0)) 
+        fi .
+    
+
+endfm
+
+red [168496141] .
